@@ -20,7 +20,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   # runtime dependencies
-  #gem.add_runtime_dependency "rjb"
+  gem.add_runtime_dependency "rjb"
 
   # devevelopment dependencies
   #gem.add_development_dependency "thor"
