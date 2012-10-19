@@ -1,17 +1,30 @@
 require 'spec_helper'
 
 describe Bezebe::CVS do
-  it 'should be able to connect to a know repository as W3' do
-    ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
-    ::Bezebe::CVS.rlog "w3c/test/foo"
-  end
+    describe "when using the W3 repository" do
+        before do
+            ::Bezebe::CVS.stub!(:puts)
+            ::Bezebe::CVS.stub!(:p)
 
-  it 'should not connect if credentials are wrong'
+            ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+        end
 
-  it 'should be able to perform a rlog'
+        it 'should be able to get information from a known file' do
+            ::Bezebe::CVS.rlog "w3c/test/foo"
+        end
 
-  describe "when using rlog" do
-    it "should do something else"
+        it 'should not be able to get information from an unknown file' do
+            ::Bezebe::CVS.rlog "w3c/test/this_doesnt_exist"
+        end
+    end
+
+    it 'should not connect if credentials are wrong'
+
+    it 'should be able to perform a rlog'
+
+    describe "when using rlog" do
+        it "should do something else"
+    end
 
 
     describe "with proper credentials" do
@@ -19,7 +32,5 @@ describe Bezebe::CVS do
 
         it "should fail"
     end
-
-  end
 
 end

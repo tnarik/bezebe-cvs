@@ -61,12 +61,14 @@ module Bezebe
             puts "\nInformation from HEAD release\n"
             puts cvslistener.revision.to_yaml
 
-            puts "\nInformation from symbolic names\n"
-            names = cvslistener.symNames.toArray
-            names.each do |name|
-                puts "- NAME: #{name.getName}       FOR REVISION: #{name.getRevision}     BRANCH?: #{name.isBranch}"
+            unless cvslistener.symNames.nil? then
+                puts "\nInformation from symbolic names\n"
+                names = cvslistener.symNames.toArray 
+                names.each do |name|
+                    puts "- NAME: #{name.getName}       FOR REVISION: #{name.getRevision}     BRANCH?: #{name.isBranch}"
+                end
+                puts "\n\n"
             end
-            puts "\n\n"
         rescue AuthenticationException => e
             p e.getMessage
             p e.printStackTrace
