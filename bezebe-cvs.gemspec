@@ -26,4 +26,7 @@ Gem::Specification.new do |gem|
     # devevelopment dependencies
     gem.add_development_dependency "thor"
     gem.add_development_dependency "bundler"
+
+    # testing
+    gem.add_development_dependency 'rspec'
 end
