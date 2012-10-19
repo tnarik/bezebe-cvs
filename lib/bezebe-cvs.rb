@@ -10,35 +10,42 @@ module Bezebe
   module CVS
     # Your code goes here...
 
+    attr_accessor :connection
 
-    def self.rlog (filename = nil)
+    def self.loadJar
         Rjb::load(nil, nil)
         Rjb::add_jar(File.expand_path(File.join(File.dirname(File.expand_path(__FILE__)), 'vendor' , 'org-netbeans-lib-cvsclient.jar')))
+    end
+
+    def self.connect(username, password, host, port = nil, repository = nil)
+        loadJar
+
+        @connection = Rjb::import('org.netbeans.lib.cvsclient.connection.PServerConnection').new
+        scrambler = Rjb::import('org.netbeans.lib.cvsclient.connection.StandardScrambler').getInstance
+
+        @connection.setUserName username        
+        @connection.setEncodedPassword(scrambler.scramble(password))
+        @connection.setHostName host
+        @connection.setPort port unless port.nil?
+        @connection.setRepository repository unless repository.nil?        
+
+        @connection.open
+    end
+
+    def self.rlog (filename = nil)
+        if @connection.nil?
+            puts "a connection is needed first"
+            return false
+        end
 
         begin
-            pserverconnection_class = Rjb::import('org.netbeans.lib.cvsclient.connection.PServerConnection')
-            scrambler_class = Rjb::import('org.netbeans.lib.cvsclient.connection.StandardScrambler')
-
-            pserverconnection = pserverconnection_class.new
-            pserverconnection.setUserName "username"
-            scrambler = scrambler_class.getInstance
-            pserverconnection.setEncodedPassword(scrambler.scramble("password"))
-            pserverconnection.setHostName "host"
-            pserverconnection.setPort 2401
-            pserverconnection.setRepository "/opt/cvs/us"        
-            pserverconnection.open
-
             standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
             client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
-            client = client_class.new(pserverconnection, standardadminhandler_class.new)
+            client = client_class.new(@connection, standardadminhandler_class.new)
             client.setLocalPath "/tmp"
 
             logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
             logcommand = logcommand_class.new
-
-            file_class = Rjb::import('java.io.File')
-            file = file_class.new "resources/ReleaseNote.xml"
-            logcommand.setModule "samplefile/module" if filename.nil?
             logcommand.setModule "#{filename}" unless filename.nil?
 
             a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
@@ -50,6 +57,16 @@ module Bezebe
 
             client.executeCommand(logcommand, a_class.new)
 
+            puts cvslistener.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts cvslistener.revision.to_yaml
+
+            puts "\nInformation from symbolic names\n"
+            names = cvslistener.symNames.toArray
+            names.each do |name|
+                puts "- NAME: #{name.getName}       FOR REVISION: #{name.getRevision}     BRANCH?: #{name.isBranch}"
+            end
+            puts "\n\n"
         rescue AuthenticationException => e
             p e.getMessage
             p e.printStackTrace
