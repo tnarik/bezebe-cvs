@@ -9,4 +9,17 @@ describe Bezebe::CVS do
   it 'should not connect if credentials are wrong'
 
   it 'should be able to perform a rlog'
+
+  describe "when using rlog" do
+    it "should do something else"
+
+
+    describe "with proper credentials" do
+        it "should work"
+
+        it "should fail"
+    end
+
+  end
+
 end
