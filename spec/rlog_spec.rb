@@ -1,7 +1,16 @@
 require 'spec_helper'
 
 describe Bezebe::CVS do
-    describe "when using the W3 repository" do
+    describe "when using a known repository (W3)" do
+
+        describe "with correct credentials" do
+            it "should work"
+        end
+
+        describe "with wrong credentials" do
+            it "shouldn't work"
+        end
+        
         before do
             ::Bezebe::CVS.stub!(:puts)
             ::Bezebe::CVS.stub!(:p)

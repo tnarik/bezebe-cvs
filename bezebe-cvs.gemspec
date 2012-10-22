@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
     gem.email       = ["tnarik@gmail.com"]
     gem.summary     = "bussy bee CVS"
     gem.description = "a set of tools for the bussy bee - CVS"
-    gem.homepage    = "http://tnarik.net/stuff/bezebe-cvs"
+    gem.homepage    = "http://github.com/tnarik/bezebe-cvs"
     gem.license     = "MIT"
 
     gem.rubyforge_project = "bezebe"
