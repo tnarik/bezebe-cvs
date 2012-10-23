@@ -12,8 +12,8 @@ describe Bezebe::CVS do
         end
         
         before do
-            ::Bezebe::CVS.stub!(:puts)
-            ::Bezebe::CVS.stub!(:p)
+            #::Bezebe::CVS.stub!(:puts)
+            #::Bezebe::CVS.stub!(:p)
 
             ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end

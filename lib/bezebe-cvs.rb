@@ -2,6 +2,7 @@ require "bezebe-cvs/version"
 
 require "bezebe-cvs/loginfo"
 require "bezebe-cvs/revision"
+require "bezebe-cvs/sym_name"
 require "bezebe-cvs/cvslistener"
 
 require "rjb"
@@ -60,12 +61,11 @@ module Bezebe
             puts cvslistener.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
             puts cvslistener.revision.to_yaml
-
             unless cvslistener.symNames.nil? then
                 puts "\nInformation from symbolic names\n"
-                names = cvslistener.symNames.toArray 
-                names.each do |name|
-                    puts "- NAME: #{name.getName}       FOR REVISION: #{name.getRevision}     BRANCH?: #{name.isBranch}"
+                names = cvslistener.symNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
                 end
                 puts "\n\n"
             end
