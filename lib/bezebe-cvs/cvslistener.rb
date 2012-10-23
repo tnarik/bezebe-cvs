@@ -20,7 +20,6 @@ module CVS
 
             unless file_info_event.getInfoContainer.getAllSymbolicNames.nil? then
                 @symNames = {}
-
                 names = file_info_event.getInfoContainer.getAllSymbolicNames.toArray 
                 names.each do |name|
                     new_symName = ::Bezebe::CVS::SymName.new name
