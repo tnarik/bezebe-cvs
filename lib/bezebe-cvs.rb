@@ -1,6 +1,6 @@
 require "bezebe-cvs/version"
 
-require "bezebe-cvs/loginfo"
+require "bezebe-cvs/log_info"
 require "bezebe-cvs/revision"
 require "bezebe-cvs/sym_name"
 require "bezebe-cvs/cvslistener"
