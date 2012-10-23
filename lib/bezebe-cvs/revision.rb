@@ -1,7 +1,7 @@
 module Bezebe
 module CVS
     class Revision
-        attr_accessor :number, :author, :message, :state, :lines, :dateString
+        attr_accessor :number, :author, :message, :state, :lines, :dateString, :commitID, :branches
 
         def initialize(revision = nil)
             if revision.kind_of? Rjb::Rjb_JavaProxy then
@@ -12,6 +12,8 @@ module CVS
                     @state = revision.getState
                     @lines = revision.getLines
                     @dateString = revision.getDateString
+                    @commitID = revision.getCommitID
+                    @branches = revision.getBranches
                 end
             end
         end
