@@ -19,7 +19,19 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from a known file' do
-            ::Bezebe::CVS.rlog "w3c/test/foo"
+            rlog = ::Bezebe::CVS.rlog "w3c/test/foo"
+
+            puts rlog.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts rlog.revision.to_yaml
+            unless rlog.symNames.nil? then
+                puts "\nInformation from symbolic names\n"
+                names = rlog.symNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
+                end
+                puts "\n\n"
+            end
         end
 
         it 'should not be able to get information from an unknown file' do

@@ -9,8 +9,6 @@ require "rjb"
 
 module Bezebe
   module CVS
-    # Your code goes here...
-
     attr_accessor :connection
 
     def self.loadJar
@@ -57,18 +55,7 @@ module Bezebe
             event_manager.addCVSListener cvslistener
 
             client.executeCommand(logcommand, a_class.new)
-
-            puts cvslistener.logInfo.to_yaml
-            puts "\nInformation from HEAD release\n"
-            puts cvslistener.revision.to_yaml
-            unless cvslistener.symNames.nil? then
-                puts "\nInformation from symbolic names\n"
-                names = cvslistener.symNames 
-                names.each do |k, name|
-                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
-                end
-                puts "\n\n"
-            end
+            return cvslistener
         rescue AuthenticationException => e
             p e.getMessage
             p e.printStackTrace
