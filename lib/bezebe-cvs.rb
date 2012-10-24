@@ -31,7 +31,7 @@ module Bezebe
         @connection.open
     end
 
-    def self.rlog (filename = nil)
+    def self.rlog (filenames = nil)
         if @connection.nil?
             puts "a connection is needed first"
             return false
@@ -45,7 +45,10 @@ module Bezebe
 
             logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
             logcommand = logcommand_class.new
-            logcommand.setModule "#{filename}" unless filename.nil?
+
+            logcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
+            filenames.each { |m| logcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
+
 
             a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
 
@@ -56,6 +59,8 @@ module Bezebe
 
             client.executeCommand(logcommand, a_class.new)
             return cvslistener
+        rescue Exception => e
+            p e
         rescue AuthenticationException => e
             p e.getMessage
             p e.printStackTrace

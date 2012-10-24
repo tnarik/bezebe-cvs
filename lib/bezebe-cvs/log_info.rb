@@ -35,7 +35,7 @@ module CVS
                             symbolicNames = logInformation.getAllSymbolicNames.toArray 
                             symbolicNames.each do |symbolicName|
                                 new_symbolicName = ::Bezebe::CVS::SymName.new symbolicName
-                                @symbolicNames[new_symbolicName.number] = new_symbolicName
+                                @symbolicNames[new_symbolicName.name] = new_symbolicName
                             end
                         end
                     end

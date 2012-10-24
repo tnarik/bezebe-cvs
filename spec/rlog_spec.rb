@@ -14,12 +14,63 @@ describe Bezebe::CVS do
         before do
             #::Bezebe::CVS.stub!(:puts)
             #::Bezebe::CVS.stub!(:p)
+            stub!(:puts)
+            stub!(:p)
 
             ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end
 
         it 'should be able to get information from a known file' do
             rlog = ::Bezebe::CVS.rlog "w3c/test/foo"
+
+            puts rlog.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts rlog.logInfo.revisions.to_yaml
+            unless rlog.logInfo.symbolicNames.nil? or rlog.logInfo.symbolicNames.empty? then
+                puts "\nInformation from symbolic names\n"
+                names = rlog.logInfo.symbolicNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
+                end
+                puts "\n\n"
+            end
+        end
+
+        it 'should be able to get information from two files' do
+            a = [ "w3c/test/foo", "w3c/test/bar" ]
+            rlog = ::Bezebe::CVS.rlog a
+
+            puts rlog.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts rlog.logInfo.revisions.to_yaml
+            unless rlog.logInfo.symbolicNames.nil? or rlog.logInfo.symbolicNames.empty? then
+                puts "\nInformation from symbolic names\n"
+                names = rlog.logInfo.symbolicNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
+                end
+                puts "\n\n"
+            end
+        end
+
+        it 'should be able to get information from a known folder' do
+            rlog = ::Bezebe::CVS.rlog "w3c/test"
+
+            puts rlog.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts rlog.logInfo.revisions.to_yaml
+            unless rlog.logInfo.symbolicNames.nil? or rlog.logInfo.symbolicNames.empty? then
+                puts "\nInformation from symbolic names\n"
+                names = rlog.logInfo.symbolicNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
+                end
+                puts "\n\n"
+            end
+        end
+
+        it 'should be able to get information from two known folders' do
+            rlog = ::Bezebe::CVS.rlog [ "w3c/test", "issues" ]
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
