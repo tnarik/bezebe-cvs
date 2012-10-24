@@ -16,7 +16,6 @@ module CVS
         end
         def fileInfoGenerated (file_info_event)
             if file_info_event.getInfoContainer._classname == "org.netbeans.lib.cvsclient.command.log.LogInformation" then
-
                 @logInfo = ::Bezebe::CVS::LogInfo.new file_info_event.getInfoContainer
                 @logInfos = [] if @logInfos.nil?;
                 @logInfos << @logInfo

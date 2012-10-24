@@ -47,7 +47,7 @@ module Bezebe
 
         begin
             client = get_cvs_client
-            #client.setLocalPath Dir.pwd
+            client.setLocalPath "/tmp/w3c/test/"
 
             statuscommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.status.StatusCommand')
             statuscommand = statuscommand_class.new
@@ -68,6 +68,7 @@ module Bezebe
             event_manager.addCVSListener cvslistener
 
             client.executeCommand(statuscommand, a)
+            return cvslistener
         rescue Exception => e
             p e
         rescue CommandException => e
@@ -86,7 +87,7 @@ module Bezebe
 
         begin
             client = get_cvs_client
-            #client.setLocalPath Dir.pwd
+            client.setLocalPath "/tmp/w3c/test/"
 
             logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.LogCommand')
             logcommand = logcommand_class.new
@@ -99,7 +100,7 @@ module Bezebe
 
             a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
             a = a_class.new
-            a.setTraceExecution true
+            #a.setTraceExecution true
 
             event_manager = client.getEventManager
             cvslistener = ::Bezebe::CVS::CvsListener.new
@@ -107,6 +108,7 @@ module Bezebe
             event_manager.addCVSListener cvslistener
 
             client.executeCommand(logcommand, a)
+            return cvslistener
         rescue Exception => e
             p e
         rescue CommandException => e

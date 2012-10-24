@@ -21,17 +21,27 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from two known files' do
-            log = ::Bezebe::CVS.log [ "file1",
-                 "file2",
-                 "file3" ]
+            log = ::Bezebe::CVS.log [ "/tmp/w3c/test/foo",
+                 "/tmp/w3c/test/bar",
+                 "/tmp/w3c/test/blah" ]
 
             puts log.logInfo.to_yaml unless log.nil?
         end
 
         it 'should be able to get information from a known file' do
-            log = ::Bezebe::CVS.log "OffnetPayments_client_4.0.0_rc013.xmlmf"
+            log = ::Bezebe::CVS.log "/tmp/w3c/test/foo"
 
-            puts log.logInfo.to_yaml unless log.nil?
+            puts log.logInfo.to_yaml
+            puts "\nInformation from HEAD release\n"
+            puts log.logInfo.revisions.to_yaml
+            unless log.logInfo.symbolicNames.nil? or log.logInfo.symbolicNames.empty? then
+                puts "\nInformation from symbolic names\n"
+                names = log.logInfo.symbolicNames 
+                names.each do |k, name|
+                    puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
+                end
+                puts "\n\n"
+            end
         end
 
     end

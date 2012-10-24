@@ -21,7 +21,12 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from a known file' do
-            status = ::Bezebe::CVS.status "file1"
+            status = ::Bezebe::CVS.status "/tmp/w3c/test/foo"
+            puts status.logInfo.to_yaml unless status.nil?
+        end
+
+        it 'should be able to get information from two known files' do
+            status = ::Bezebe::CVS.status [ "/tmp/w3c/test/foo", "/tmp/w3c/test/bar" ]
             puts status.logInfo.to_yaml unless status.nil?
         end
 
