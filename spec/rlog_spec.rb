@@ -15,7 +15,7 @@ describe Bezebe::CVS do
             #::Bezebe::CVS.stub!(:puts)
             #::Bezebe::CVS.stub!(:p)
             stub!(:puts)
-            stub!(:p)
+            #stub!(:p)
 
             ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end

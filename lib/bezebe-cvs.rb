@@ -31,6 +31,92 @@ module Bezebe
         @connection.open
     end
 
+    def self.get_cvs_client
+        standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
+        client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
+        client = client_class.new(@connection, standardadminhandler_class.new)
+
+        return client
+    end
+
+    def self.status (filenames = nil)
+        if @connection.nil?
+            puts "a connection is needed first"
+            return false
+        end
+
+        begin
+            client = get_cvs_client
+            #client.setLocalPath Dir.pwd
+
+            statuscommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.status.StatusCommand')
+            statuscommand = statuscommand_class.new
+    
+            file_class = Rjb::import('java.io.File')
+            files = []
+            files << ( file_class.new  filenames ) unless filenames.nil? or filenames.is_a? Array
+            filenames.each { |m| files << ( file_class.new m) } unless filenames.nil? or !filenames.is_a? Array
+            statuscommand.setFiles files
+
+            a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
+            a = a_class.new
+            #a.setTraceExecution true
+
+            event_manager = client.getEventManager
+            cvslistener = ::Bezebe::CVS::CvsListener.new
+            cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+            event_manager.addCVSListener cvslistener
+
+            client.executeCommand(statuscommand, a)
+        rescue Exception => e
+            p e
+        rescue CommandException => e
+            p e.printStackTrace
+        rescue AuthenticationException => e
+            p e.getMessage
+            p e.printStackTrace
+        end
+    end
+
+    def self.log (filenames = nil)
+        if @connection.nil?
+            puts "a connection is needed first"
+            return false
+        end
+
+        begin
+            client = get_cvs_client
+            #client.setLocalPath Dir.pwd
+
+            logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.LogCommand')
+            logcommand = logcommand_class.new
+    
+            file_class = Rjb::import('java.io.File')
+            files = []
+            files << ( file_class.new  filenames ) unless filenames.nil? or filenames.is_a? Array
+            filenames.each { |m| files << ( file_class.new m) } unless filenames.nil? or !filenames.is_a? Array
+            logcommand.setFiles files
+
+            a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
+            a = a_class.new
+            a.setTraceExecution true
+
+            event_manager = client.getEventManager
+            cvslistener = ::Bezebe::CVS::CvsListener.new
+            cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+            event_manager.addCVSListener cvslistener
+
+            client.executeCommand(logcommand, a)
+        rescue Exception => e
+            p e
+        rescue CommandException => e
+            p e.printStackTrace
+        rescue AuthenticationException => e
+            p e.getMessage
+            p e.printStackTrace
+        end
+    end
+
     def self.rlog (filenames = nil)
         if @connection.nil?
             puts "a connection is needed first"
@@ -38,17 +124,14 @@ module Bezebe
         end
 
         begin
-            standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
-            client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
-            client = client_class.new(@connection, standardadminhandler_class.new)
-            client.setLocalPath "/tmp"
+            client = get_cvs_client
+            #client.setLocalPath "/tmp"
 
             logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
             logcommand = logcommand_class.new
 
             logcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
             filenames.each { |m| logcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
-
 
             a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
 
