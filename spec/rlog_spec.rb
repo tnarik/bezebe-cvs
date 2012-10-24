@@ -23,10 +23,10 @@ describe Bezebe::CVS do
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
-            puts rlog.revision.to_yaml
-            unless rlog.symNames.nil? then
+            puts rlog.logInfo.revisions.to_yaml
+            unless rlog.logInfo.symbolicNames.nil? or rlog.logInfo.symbolicNames.empty? then
                 puts "\nInformation from symbolic names\n"
-                names = rlog.symNames 
+                names = rlog.logInfo.symbolicNames 
                 names.each do |k, name|
                     puts "- NAME: #{name.name}       FOR REVISION: #{name.revision}     BRANCH?: #{name.isBranch?}"
                 end

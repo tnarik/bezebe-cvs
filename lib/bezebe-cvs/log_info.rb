@@ -20,11 +20,8 @@ module CVS
                         @locks = logInformation.getLocks
     
                         # list of revisions
-                        #@revisions = logInformation.
-                        #@revision = ::Bezebe::CVS::Revision.new file_info_event.getInfoContainer.getRevision @logInfo.headRevision
-    
+                        @revisions = {}
                         unless logInformation.getRevisionList.nil? then
-                            @revisions = {}
                             revisions = logInformation.getRevisionList.toArray 
                             revisions.each do |revision|
                                 new_revision = ::Bezebe::CVS::Revision.new revision
@@ -33,12 +30,27 @@ module CVS
                         end
     
                         # list of symbolic names
-                        #@symbolicNames = logInformation.
+                        @symbolicNames = {}
+                        unless logInformation.getAllSymbolicNames.nil? then
+                            symbolicNames = logInformation.getAllSymbolicNames.toArray 
+                            symbolicNames.each do |symbolicName|
+                                new_symbolicName = ::Bezebe::CVS::SymName.new symbolicName
+                                @symbolicNames[new_symbolicName.number] = new_symbolicName
+                            end
+                        end
                     end
                 end
             rescue Exception => e
                 p e.message
             end
+        end
+
+        def symName_for_revision (revision)
+            list = []
+            @symbolicNames.each do |k, symbolicName|
+                list << symbolicName if k == revision
+            end
+            return list;
         end
     end 
 end
