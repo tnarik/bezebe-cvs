@@ -39,6 +39,61 @@ module Bezebe
         return client
     end
 
+    def self.update
+        if @connection.nil?
+            puts "a connection is needed first"
+            return false
+        end
+
+        begin
+            client = get_cvs_client
+            client.setLocalPath "/tmp/w3c/test/"
+        rescue Exception => e
+            p e
+        rescue CommandException => e
+            p e.printStackTrace
+        rescue AuthenticationException => e
+            p e.getMessage
+            p e.printStackTrace
+        end
+    end
+
+    def self.checkout (filenames = nil)
+        if @connection.nil?
+            puts "a connection is needed first"
+            return false
+        end
+
+        begin
+            client = get_cvs_client
+            client.setLocalPath "/tmp/"
+
+            checkoutcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand')
+            checkoutcommand = checkoutcommand_class.new
+
+            checkoutcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
+            filenames.each { |m| checkoutcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
+
+            a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
+            a = a_class.new
+
+            event_manager = client.getEventManager
+            cvslistener = ::Bezebe::CVS::CvsListener.new
+            cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+            event_manager.addCVSListener cvslistener
+
+            checkoutcommand.setNotRunModuleProgram true
+            client.executeCommand(checkoutcommand, a)
+        rescue Exception => e
+            p e
+        rescue CommandException => e
+            p e.printStackTrace
+        rescue AuthenticationException => e
+            p e.getMessage
+            p e.printStackTrace
+        end
+    end
+ 
     def self.status (filenames = nil)
         if @connection.nil?
             puts "a connection is needed first"
