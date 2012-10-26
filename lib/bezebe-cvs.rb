@@ -80,12 +80,14 @@ module Bezebe
             event_manager = client.getEventManager
             cvslistener = ::Bezebe::CVS::CvsListener.new
             cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+            cvslistener.client = client
             event_manager.addCVSListener cvslistener
 
-            checkoutcommand.setNotRunModuleProgram true
             client.executeCommand(checkoutcommand, a)
-        rescue Exception => e
+        rescue => e
             p e
+        rescue CommandAbortedException => e
+            p e.printStackTrace
         rescue CommandException => e
             p e.printStackTrace
         rescue AuthenticationException => e

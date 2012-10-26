@@ -43,6 +43,14 @@ describe Bezebe::CVS do
         it 'should have issues to checkout a known file and an wrong module one (again)' do
             b = ::Bezebe::CVS.checkout [ "w3c/test/foo", "/somefakeroot/w3c/test/somethingthatisnotthere" ]
         end
+
+        it 'should be fast getting a folder' do
+            100.times do
+                FileUtils.rm_rf "/tmp/w3c/";
+                ::Bezebe::CVS.checkout "w3c"
+            end
+        end
+
     end
 
 end

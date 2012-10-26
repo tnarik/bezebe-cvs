@@ -2,25 +2,36 @@ module Bezebe
 module CVS
     class CvsListener
 
-        attr_accessor :logInfo, :logInfos
+        attr_accessor :logInfo, :logInfos, :client
 
         def messageSent (message_event)
-            p "sent"
+            #p "sent"
+            #p message_event.getMessage if !message_event.getMessage.empty?
+            #p message_event.isError if message_event.isError
+            #p message_event.isTagged
+            #p message_event.toString
+            #p message_event.getSource._classname
+            if message_event.getSource._classname == "org.netbeans.lib.cvsclient.response.ErrorMessageResponse" then
+                #p message_event.getSource.getMessage    
+                if message_event.getSource.getMessage =~ /\[server\ aborted\]/ then
+                    client.abort
+                end
+            end
         end
         def fileAdded (file_added_event)
-            p "added"
+            #p "added"
         end
         def fileToRemove (file_to_remove_event)
-            p "toremove"
+            #p "toremove"
         end
         def fileRemoved (file_removed_event)
-            p "removed"
+            #p "removed"
         end
         def fileUpdated (file_updated_event)
-            p "updated"
+            #p "updated"
         end
         def fileInfoGenerated (file_info_event)
-            p "info"
+            #p "info"
             if file_info_event.getInfoContainer._classname == "org.netbeans.lib.cvsclient.command.log.LogInformation" then
                 @logInfo = ::Bezebe::CVS::LogInfo.new file_info_event.getInfoContainer
                 @logInfos = [] if @logInfos.nil?;
@@ -40,10 +51,10 @@ module CVS
             return nil
         end
         def commandTerminated (termination_event)
-            p "terminated"
+            #p "terminated"
         end
         def moduleExpanded (module_expansion_event)
-            p "expanded"
+            #p "expanded"
         end
     end
 end
