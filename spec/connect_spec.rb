@@ -29,20 +29,34 @@ describe Bezebe::CVS::CVSClient do
         end
 
         context "when using wrong credentials" do
+            before :each do
+                @client1 = ::Bezebe::CVS::CVSClient.new
+                @result = @client1.connect "anonymous", "wrongpassword", "dev.w3.org", nil, "/sources/public"
+            end
+
             it "shouldn't establish a connection" do
-                client1 = ::Bezebe::CVS::CVSClient.new
-                result = client1.connect "anonymous", "wrongpassword", "dev.w3.org", nil, "/sources/public"
-                result.should be_false
-                p client1.last_error
+                @result.should be_false
+            end
+
+            it "should correctly report the error as an Authentication error" do
+                @client1.last_error.should_not be_nil
+                @client1.last_error.should match /AUTHENTICATION/
             end
         end
 
         context "when using wrong hostname" do
+            before :each do
+                @client1 = ::Bezebe::CVS::CVSClient.new
+                @result = @client1.connect "anonymous", "anonymous", "wrongdev.w3.org", nil, "/sources/public"
+            end
+
             it "shouldn't establish a connection" do
-                client1 = ::Bezebe::CVS::CVSClient.new
-                result = client1.connect "anonymous", "anonymous", "wrongdev.w3.org", nil, "/sources/public"
-                result.should be_false
-                p client1.last_error
+                @result.should be_false
+            end
+
+            it "should correctly report the error as an configuration error" do
+                @client1.last_error.should_not be_nil
+                @client1.last_error.should match /CONFIGURATION/
             end
         end
 

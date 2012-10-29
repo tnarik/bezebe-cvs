@@ -30,9 +30,15 @@ module Bezebe
                 @connection.open
                 return true
             rescue AuthenticationException => e
-                p e.getMessage
-                p e.printStackTrace
-                @last_error = "AUTHENTICATION ERROR"
+                #p e
+                #p e.getMessage
+                #p e.printStackTrace
+                case e.getMessage
+                    when "AuthenticationFailed"
+                        @last_error = "AUTHENTICATION ERROR"
+                    when "IOException"
+                        @last_error = "CONFIGURATION ERROR"
+                end
                 return false
             end
         end
