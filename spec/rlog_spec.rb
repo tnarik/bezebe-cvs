@@ -16,12 +16,12 @@ describe Bezebe::CVS do
             #::Bezebe::CVS.stub!(:p)
             stub!(:puts)
             #stub!(:p)
-
-            ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+            @client1 = ::Bezebe::CVS::CVSClient.new
+            @client1.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end
 
         it 'should be able to get information from a known file' do
-            rlog = ::Bezebe::CVS.rlog "w3c/test/foo"
+            rlog = @client1.rlog "w3c/test/foo"
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
@@ -38,7 +38,7 @@ describe Bezebe::CVS do
 
         it 'should be able to get information from two files' do
             a = [ "w3c/test/foo", "w3c/test/bar" ]
-            rlog = ::Bezebe::CVS.rlog a
+            rlog = @client1.rlog a
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
@@ -54,7 +54,7 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from a known folder' do
-            rlog = ::Bezebe::CVS.rlog "w3c/test"
+            rlog = @client1.rlog "w3c/test"
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
@@ -70,7 +70,7 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from two known folders' do
-            rlog = ::Bezebe::CVS.rlog [ "w3c/test", "issues" ]
+            rlog = @client1.rlog [ "w3c/test", "issues" ]
 
             puts rlog.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"
@@ -86,7 +86,7 @@ describe Bezebe::CVS do
         end
 
         it 'should not be able to get information from an unknown file' do
-            ::Bezebe::CVS.rlog "w3c/test/this_doesnt_exist"
+            @client1.rlog "w3c/test/this_doesnt_exist"
         end
     end
 

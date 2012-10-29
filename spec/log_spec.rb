@@ -16,12 +16,12 @@ describe Bezebe::CVS do
             #::Bezebe::CVS.stub!(:p)
             #stub!(:puts)
             #stub!(:p)
-
-            ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+            @client1 = ::Bezebe::CVS::CVSClient.new
+            @client1.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end
 
         it 'should be able to get information from two known files' do
-            log = ::Bezebe::CVS.log [ "/tmp/w3c/test/foo",
+            log = @client1.log [ "/tmp/w3c/test/foo",
                  "/tmp/w3c/test/bar",
                  "/tmp/w3c/test/blah" ]
 
@@ -29,7 +29,7 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to get information from a known file' do
-            log = ::Bezebe::CVS.log "/tmp/w3c/test/foo"
+            log = @client1.log "/tmp/w3c/test/foo"
 
             puts log.logInfo.to_yaml
             puts "\nInformation from HEAD release\n"

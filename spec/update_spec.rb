@@ -16,17 +16,17 @@ describe Bezebe::CVS do
             #::Bezebe::CVS.stub!(:p)
             #stub!(:puts)
             #stub!(:p)
-
-            ::Bezebe::CVS.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+            @client1 = ::Bezebe::CVS::CVSClient.new
+            @client1.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
         end
 
         it 'should be able to get information from a known file' do
-            status = ::Bezebe::CVS.update "/tmp/w3c/test/foo"
+            status = @client1.update "/tmp/w3c/test/foo"
             puts status.logInfo.to_yaml unless status.nil?
         end
 
         it 'should be able to get information from two known files' do
-            status = ::Bezebe::CVS.update [ "/tmp/w3c/test/foo", "/tmp/w3c/test/bar" ]
+            status = @client1.update [ "/tmp/w3c/test/foo", "/tmp/w3c/test/bar" ]
             puts status.logInfo.to_yaml unless status.nil?
         end
 
