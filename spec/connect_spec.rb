@@ -26,6 +26,18 @@ describe Bezebe::CVS::CVSClient do
                    is_open.should be_true 
                 end
             end
+
+            describe "and if another connection is created" do
+                before :each do
+                    @client2 = ::Bezebe::CVS::CVSClient.new
+                    @result2 = @client2.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+                end
+
+                it "both should be opened" do
+                    @client1.is_open?.should be_true
+                    @client2.is_open?.should be_true
+                end
+            end
         end
 
         context "when using wrong credentials" do
