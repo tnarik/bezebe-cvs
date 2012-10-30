@@ -27,7 +27,7 @@ describe Bezebe::CVS::CVSClient do
                 end
             end
 
-            describe "and if another connection is created" do
+            context "and when another connection is created" do
                 before :each do
                     @client2 = ::Bezebe::CVS::CVSClient.new
                     @result2 = @client2.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
@@ -36,6 +36,18 @@ describe Bezebe::CVS::CVSClient do
                 it "both should be opened" do
                     @client1.is_open?.should be_true
                     @client2.is_open?.should be_true
+                end
+            end
+
+            context "and when another connection fails to be created" do
+                before :each do
+                    @client2 = ::Bezebe::CVS::CVSClient.new
+                    @result2 = @client2.connect "anonymous", "wrongpassword", "dev.w3.org", nil, "/sources/public"
+                end
+
+                it "it should remain opened while the new one doesn't" do
+                    @client1.is_open?.should be_true
+                    @client2.is_open?.should be_false
                 end
             end
         end
@@ -50,7 +62,7 @@ describe Bezebe::CVS::CVSClient do
                 @result.should be_false
             end
 
-            it "should correctly report the error as an Authentication error" do
+            it "should correctly report the error as an authentication error" do
                 @client1.last_error.should_not be_nil
                 @client1.last_error.should match /AUTHENTICATION/
             end
@@ -66,7 +78,7 @@ describe Bezebe::CVS::CVSClient do
                 @result.should be_false
             end
 
-            it "should correctly report the error as an configuration error" do
+            it "should correctly report the error as a configuration error" do
                 @client1.last_error.should_not be_nil
                 @client1.last_error.should match /CONFIGURATION/
             end
