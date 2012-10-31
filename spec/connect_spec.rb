@@ -19,32 +19,32 @@ describe Bezebe::CVS::CVSClient do
         end
 
         context "regarding parameters" do
+            it "supports a hash" do
+                client = ::Bezebe::CVS::CVSClient.new
+                expect { client.connect @connection_details }.to_not raise_error (ArgumentError)
+            end
+
             it "supports separate arguments" do
                 client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect "anonymous", "anonymous", "dev.w3.org", "/sources/public", nil }.to_not raise_error (ArgumentError)
+                expect { client.connect @connection_details[:username], 
+                    @connection_details[:password],
+                    @connection_details[:host],
+                    @connection_details[:repository],
+                    nil }.to_not raise_error (ArgumentError)
             end
             it "supports separate arguments with a default port" do
                 client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect "anonymous", "anonymous", "dev.w3.org", "/sources/public" }.to_not raise_error (ArgumentError)
-            end
-            it "supports a hash (1.9 syntax)" do
-                client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect username: "anonymous", password: "anonymous", host: "dev.w3.org", repository: "/sources/public" }.to_not raise_error (ArgumentError)
-            end
-            it "supports a hash (pre 1.9 syntax)" do
-                client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect :username => "anonymous", :password => "anonymous", :host => "dev.w3.org", :repository => "/sources/public" }.to_not raise_error (ArgumentError)
-            end
-            it "supports a hash (explicit)" do
-                client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect({:username => "anonymous", :password => "anonymous", :host => " dev.w3.org", :repository => "/sources/public"}) }.to_not raise_error (ArgumentError)
+                expect { client.connect lient.connect @connection_details[:username], 
+                    @connection_details[:password],
+                    @connection_details[:host],
+                    @connection_details[:repository] }.to_not raise_error (ArgumentError)
             end
         end
 
         context "when using correct credentials" do
             before :each do
                 @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect "anonymous", "anonymous", "dev.w3.org", "/sources/public", nil
+                @result = @client1.connect @connection_details
             end
 
             it "establishes a connection" do
@@ -61,7 +61,7 @@ describe Bezebe::CVS::CVSClient do
             context "and when another connection is created" do
                 before :each do
                     @client2 = ::Bezebe::CVS::CVSClient.new
-                    @result2 = @client2.connect "anonymous", "anonymous", "dev.w3.org", "/sources/public", nil
+                    @result2 = @client2.connect @connection_details
                 end
 
                 it "remains open and the new one is open as well" do
@@ -73,7 +73,8 @@ describe Bezebe::CVS::CVSClient do
             context "and when another connection fails to be created" do
                 before :each do
                     @client2 = ::Bezebe::CVS::CVSClient.new
-                    @result2 = @client2.connect "anonymous", "wrongpassword", "dev.w3.org", "/sources/public", nil
+                    wrong_connection_details = @connection_details.merge password: "wrongpassword"
+                    @result2 = @client2.connect wrong_connection_details
                 end
 
                 it "remains opened while the new one doesn't" do
@@ -86,7 +87,8 @@ describe Bezebe::CVS::CVSClient do
         context "when using wrong credentials" do
             before :each do
                 @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect "anonymous", "wrongpassword", "dev.w3.org", "/sources/public", nil
+                wrong_connection_details = @connection_details.merge password: "wrongpassword"
+                @result = @client1.connect wrong_connection_details
             end
 
             it "doesn't establish a connection" do
@@ -102,7 +104,8 @@ describe Bezebe::CVS::CVSClient do
         context "when using wrong hostname" do
             before :each do
                 @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect "anonymous", "anonymous", "wrongdev.w3.org", "/sources/public", nil
+                wrong_connection_details = @connection_details.merge host: "wrongdev.w3.org"
+                @result = @client1.connect wrong_connection_details
             end
 
             it "doesn't establish a connection" do
