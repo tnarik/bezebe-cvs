@@ -15,7 +15,7 @@ describe Bezebe::CVS do
             stub!(:puts)
             #stub!(:p)
             @client1 = ::Bezebe::CVS::CVSClient.new
-            @client1.connect "anonymous", "anonymous", "dev.w3.org", nil, "/sources/public"
+            @client1.connect FactoryGirl.attributes_for(:connection_details)
         end
 
         it 'should be able to get information from a known file' do
