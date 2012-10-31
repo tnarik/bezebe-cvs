@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Bezebe::CVS::CVSClient do
 
     it { should respond_to(:connect) }

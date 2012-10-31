@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Bezebe::CVS do
     describe "when using a known repository (W3)" do
 
