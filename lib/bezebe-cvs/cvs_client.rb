@@ -16,16 +16,27 @@ module Bezebe
             ::Bezebe::CVS.loadJar
         end
 
-        def connect(username, password, host, port = nil, repository = nil)
+        def connect(*connection_details)
             @connection = Rjb::import('org.netbeans.lib.cvsclient.connection.PServerConnection').new
             scrambler = Rjb::import('org.netbeans.lib.cvsclient.connection.StandardScrambler').getInstance
-    
-            @connection.setUserName username        
-            @connection.setEncodedPassword(scrambler.scramble(password))
-            @connection.setHostName host
-            @connection.setPort port unless port.nil?
-            @connection.setRepository repository unless repository.nil?        
-    
+
+            if connection_details.size == 1 then
+                connection_details = connection_details[0]
+
+                @connection.setUserName connection_details[:username]
+                @connection.setEncodedPassword(scrambler.scramble(connection_details[:password]))
+                @connection.setHostName connection_details[:host]
+                @connection.setRepository connection_details[:repository] unless connection_details[:repository].nil?
+                @connection.setPort connection_details[:port] unless connection_details[:port].nil?
+            elsif connection_details.size >= 4 then
+                @connection.setUserName connection_details[0]        
+                @connection.setEncodedPassword(scrambler.scramble(connection_details[1]))
+                @connection.setHostName connection_details[2]
+                @connection.setRepository connection_details[3] unless connection_details[3].nil?   
+                @connection.setPort connection_details[4] unless connection_details[4].nil?
+            end
+                
+
             begin
                 @connection.open
                 return true
