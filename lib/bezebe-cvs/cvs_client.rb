@@ -74,7 +74,7 @@ module Bezebe
             end
         end
     
-        def checkout (filenames = nil)
+        def checkout (path, filenames = nil)
             if @connection.nil?
                 puts "a connection is needed first"
                 return false
@@ -82,7 +82,7 @@ module Bezebe
     
             begin
                 client = get_cvs_client
-                client.setLocalPath "/tmp/"
+                client.setLocalPath path
     
                 checkoutcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand')
                 checkoutcommand = checkoutcommand_class.new
@@ -112,7 +112,7 @@ module Bezebe
             end
         end
     
-        def status (filenames = nil)
+        def status (path, filenames = nil)
             if @connection.nil?
                 puts "a connection is needed first"
                 return false
@@ -120,7 +120,7 @@ module Bezebe
     
             begin
                 client = get_cvs_client
-                client.setLocalPath "/tmp/w3c/test/"
+                client.setLocalPath path
     
                 statuscommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.status.StatusCommand')
                 statuscommand = statuscommand_class.new
@@ -152,7 +152,7 @@ module Bezebe
             end
         end
     
-        def log (filenames = nil)
+        def log (path, filenames = nil)
             if @connection.nil?
                 puts "a connection is needed first"
                 return false
@@ -160,7 +160,7 @@ module Bezebe
     
             begin
                 client = get_cvs_client
-                client.setLocalPath "/tmp/w3c/test/"
+                client.setLocalPath path
     
                 logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.LogCommand')
                 logcommand = logcommand_class.new
@@ -173,7 +173,6 @@ module Bezebe
     
                 a_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
                 a = a_class.new
-                #a.setTraceExecution true
     
                 event_manager = client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
@@ -200,7 +199,6 @@ module Bezebe
     
             begin
                 client = get_cvs_client
-                #client.setLocalPath "/tmp"
     
                 logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
                 logcommand = logcommand_class.new

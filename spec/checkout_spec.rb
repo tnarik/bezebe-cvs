@@ -21,33 +21,33 @@ describe Bezebe::CVS do
         end
 
         it 'should be able to checkout a single file' do
-            a = @client1.checkout "w3c/test/foo"
+            a = @client1.checkout "/tmp/", "w3c/test/foo"
         end
 
         it 'should be able to checkout two files' do
-            b = @client1.checkout [ "w3c/test/foo", "w3c/test/bar" ]
+            b = @client1.checkout "/tmp/", [ "w3c/test/foo", "w3c/test/bar" ]
         end
 
         it 'should have issues to checkout a known file and an unkown one' do
-            b = @client1.checkout [ "w3c/test/foo", "w3c/test/somethingthatisnotthere" ]
+            b = @client1.checkout "/tmp/", [ "w3c/test/foo", "w3c/test/somethingthatisnotthere" ]
         end
 
         it 'should have issues to checkout a known file and an wrong module one' do
-            b = @client1.checkout [ "w3c/test/foo", "somefakeroot/w3c/test/somethingthatisnotthere" ]
+            b = @client1.checkout "/tmp/", [ "w3c/test/foo", "somefakeroot/w3c/test/somethingthatisnotthere" ]
         end
 
         it 'should have issues to checkout a known file and an unkown one (again)' do
-            b = @client1.checkout [ "w3c/test/foo", "/w3c/test/somethingthatisnotthere" ]
+            b = @client1.checkout "/tmp/", [ "w3c/test/foo", "/w3c/test/somethingthatisnotthere" ]
         end
 
         it 'should have issues to checkout a known file and an wrong module one (again)' do
-            b = @client1.checkout [ "w3c/test/foo", "/somefakeroot/w3c/test/somethingthatisnotthere" ]
+            b = @client1.checkout "/tmp/", [ "w3c/test/foo", "/somefakeroot/w3c/test/somethingthatisnotthere" ]
         end
 
         it 'should be fast getting a folder' do
             1.times do
                 FileUtils.rm_rf "/tmp/w3c/";
-                @client1.checkout "w3c"
+                @client1.checkout "/tmp/", "w3c"
             end
         end
 
