@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
     gem.version     = Bezebe::CVS::VERSION
     gem.authors     = ["Tnarik Innael"]
     gem.email       = ["tnarik@gmail.com"]
-    gem.summary     = "bussy bee CVS"
-    gem.description = "a set of tools for the bussy bee - CVS"
+    gem.summary     = "busy bee - CVS module"
+    gem.description = "busy bee - CVS module is a Ruby wrapper for the NetBeans Java CVS client API, using the 'rjb' gem.\nIt allows to connect to a CVS repository programatically via a Ruby API instead of triggering CVS client commands."
     gem.homepage    = "http://github.com/tnarik/bezebe-cvs"
     gem.license     = "MIT"
 
