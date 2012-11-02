@@ -44,12 +44,12 @@ describe Bezebe::CVS do
             b = @client1.checkout "/tmp/", [ "w3c/test/foo", "/somefakeroot/w3c/test/somethingthatisnotthere" ]
         end
 
-        it 'should be fast getting a folder' do
-            1.times do
-                FileUtils.rm_rf "/tmp/w3c/";
-                @client1.checkout "/tmp/", "w3c"
-            end
-        end
+        #it 'should be fast getting a folder' do
+        #    1.times do
+        #        FileUtils.rm_rf "/tmp/w3c/";
+        #        @client1.checkout "/tmp/", "w3c"
+        #    end
+        #end
 
     end
 
