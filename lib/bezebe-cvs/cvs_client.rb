@@ -8,7 +8,7 @@ require "bezebe-cvs/cvslistener"
 require "rjb"
 
 module Bezebe
-  module CVS
+module CVS
     class CVSClient
         attr_accessor :connection, :last_error
 
@@ -41,20 +41,21 @@ module Bezebe
                 @connection.open
                 return true
             rescue AuthenticationException => e
-                #p e
-                #p e.getMessage
-                #p e.printStackTrace
+                @last_error = {}
+                @last_error[:message] = e.getMessage
+                @last_error[:localized_message] = e.getLocalizedMessage
+                @last_error[:cause] = e.getCause.nil? ? "" : e.getCause.toString
                 case e.getMessage
                     when "AuthenticationFailed"
-                        @last_error = "AUTHENTICATION ERROR"
+                        @last_error[:type] = AUTHENTICATION_ERROR
                     when "IOException"
-                        @last_error = "CONFIGURATION ERROR"
+                        @last_error[:type] = COMMUNICATION_ERROR
                 end
                 return false
             end
         end
     
-        def is_open?
+        def is_connected?
             return @connection.isOpen
         end
     
@@ -234,5 +235,5 @@ module Bezebe
             end
         end
     end
-  end
+end
 end

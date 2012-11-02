@@ -9,108 +9,113 @@ describe Bezebe::CVS::CVSClient do
     describe "#connect" do
 
         before :all do
+            @client = ::Bezebe::CVS::CVSClient.new
+            @connection_details = FactoryGirl.build(:connection_details)
+            @connection_details_attributes = FactoryGirl.attributes_for(:connection_details)
+
             #::Bezebe::CVS.stub!(:puts)
             #::Bezebe::CVS.stub!(:p)
             #stub!(:puts)
             #stub!(:p)
         end
 
+
         context "regarding parameters" do
             it "supports a hash" do
-                client = ::Bezebe::CVS::CVSClient.new
-                expect { client.connect @connection_details }.to_not raise_error (ArgumentError)
+                expect { @client.connect @connection_details_attributes }.to_not raise_error (ArgumentError)
             end
 
             it "supports separate arguments" do
-                client = ::Bezebe::CVS::CVSClient.new
-                connection_details = FactoryGirl.build(:connection_details)
-                expect { client.connect connection_details.username, 
-                    connection_details.password,
-                    connection_details.host,
-                    connection_details.repository,
-                    connection_details.port }.to_not raise_error (ArgumentError)
+                expect { @client.connect @connection_details.username, 
+                    @connection_details.password,
+                    @connection_details.host,
+                    @connection_details.repository,
+                    @connection_details.port }.to_not raise_error (ArgumentError)
             end
             it "supports separate arguments with a default port" do
-                client = ::Bezebe::CVS::CVSClient.new
-                connection_details = FactoryGirl.build(:connection_details)
-                expect { client.connect connection_details.username, 
-                    connection_details.password,
-                    connection_details.host,
-                    connection_details.repository }.to_not raise_error (ArgumentError)
+                expect { @client.connect @connection_details.username, 
+                    @connection_details.password,
+                    @connection_details.host,
+                    @connection_details.repository }.to_not raise_error (ArgumentError)
             end
         end
+
 
         context "when using correct credentials" do
             before :each do
-                @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect FactoryGirl.attributes_for(:connection_details)
+                @client_connected = @client.connect @connection_details_attributes
             end
 
-            it "establishes a connection" do
-                @result.should be_true
+            it "reports establishing a connection" do
+                @connection_details_attributes.should be_true
             end
 
-            describe "and the connection" do
-                it "is open" do
-                   is_open = @client1.is_open?
-                   is_open.should be_true 
-                end
+            it "reports being connected" do
+                @client.is_connected?.should be_true 
             end
 
-            context "and when another connection is created" do
+            context "and when another client connects" do
                 before :each do
-                    @client2 = ::Bezebe::CVS::CVSClient.new
-                    @result2 = @client2.connect FactoryGirl.attributes_for(:connection_details)
+                    @another_client = ::Bezebe::CVS::CVSClient.new
+                    @another_client_connected = @another_client.connect @connection_details_attributes
                 end
 
-                it "remains open and the new one is open as well" do
-                    @client1.is_open?.should be_true
-                    @client2.is_open?.should be_true
+                it "remains connected and the new one is connected as well" do
+                    @client.is_connected?.should be_true
+                    @another_client.is_connected?.should be_true
                 end
             end
 
-            context "and when another connection fails to be created" do
+            context "and when another client fails to connect" do
                 before :each do
-                    @client2 = ::Bezebe::CVS::CVSClient.new
-                    @result2 = @client2.connect FactoryGirl.attributes_for(:connection_details, password: "wrongpassword")
+                    @another_client = ::Bezebe::CVS::CVSClient.new
+                    @another_client_connected = @another_client.connect FactoryGirl.attributes_for(:connection_details, password: "wrongpassword")
                 end
 
-                it "remains opened while the new one doesn't" do
-                    @client1.is_open?.should be_true
-                    @client2.is_open?.should be_false
+                it "remains connected while the new one doesn't" do
+                    @client.is_connected?.should be_true
+                    @another_client.is_connected?.should be_false
                 end
             end
         end
+
 
         context "when using wrong credentials" do
             before :each do
-                @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect FactoryGirl.attributes_for(:connection_details, password: "wrongpassword")
+                @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, password: "wrongpassword")
             end
 
-            it "doesn't establish a connection" do
-                @result.should be_false
+            it "reports not establishing a connection" do
+                @client_connected.should be_false
             end
 
-            it "correctly reports the error as an authentication error" do
-                @client1.last_error.should_not be_nil
-                @client1.last_error.should match /AUTHENTICATION/
+            it "reports not being connected" do
+                @client.is_connected?.should be_false 
+            end
+
+            it "reports the error as an authentication error" do
+                @client.last_error.should_not be_nil
+                expect(@client.last_error[:type]).to eq(Bezebe::CVS::AUTHENTICATION_ERROR)
             end
         end
 
+
         context "when using wrong hostname" do
             before :each do
-                @client1 = ::Bezebe::CVS::CVSClient.new
-                @result = @client1.connect FactoryGirl.attributes_for(:connection_details, host: "wrongdev.w3.org")
+                @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, host: "wronghost")
             end
 
-            it "doesn't establish a connection" do
-                @result.should be_false
+            it "reports not establishing a connection" do
+                @client_connected.should be_false
             end
 
-            it "correctly reports the error as a configuration error" do
-                @client1.last_error.should_not be_nil
-                @client1.last_error.should match /CONFIGURATION/
+            it "reports not being connected" do
+                @client.is_connected?.should be_false 
+            end
+
+            it "reports the error as a communication error" do
+                @client.last_error.should_not be_nil
+                expect(@client.last_error[:type]).to eq(Bezebe::CVS::COMMUNICATION_ERROR)
             end
         end
 

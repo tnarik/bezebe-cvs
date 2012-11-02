@@ -10,6 +10,9 @@ require "rjb"
 
 module Bezebe
     module CVS
+        AUTHENTICATION_ERROR = 1
+        COMMUNICATION_ERROR = 2
+
         def self.loadJar
             Rjb::load(nil, nil)
             Rjb::add_jar(File.expand_path(File.join(File.dirname(File.expand_path(__FILE__)), 'vendor' , 'org-netbeans-lib-cvsclient.jar')))
