@@ -12,7 +12,6 @@ module CVS
             #p message_event.toString
             #p message_event.getSource._classname
             if message_event.getSource._classname == "org.netbeans.lib.cvsclient.response.ErrorMessageResponse" then
-                #p message_event.getSource.getMessage    
                 if message_event.getSource.getMessage =~ /\[server\ aborted\]/ then
                     client.abort
                 end
@@ -51,7 +50,7 @@ module CVS
             return nil
         end
         def commandTerminated (termination_event)
-            #p "terminated"
+            p "terminated"
         end
         def moduleExpanded (module_expansion_event)
             #p "expanded"

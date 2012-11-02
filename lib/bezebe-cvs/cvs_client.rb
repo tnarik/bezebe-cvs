@@ -50,6 +50,8 @@ module CVS
                         @last_error[:type] = AUTHENTICATION_ERROR
                     when "IOException"
                         @last_error[:type] = COMMUNICATION_ERROR
+                    when "ConnectException"
+                        @last_error[:type] = CONNECTION_ERROR
                 end
                 return false
             end

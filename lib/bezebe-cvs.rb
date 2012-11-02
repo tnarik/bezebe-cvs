@@ -12,6 +12,7 @@ module Bezebe
     module CVS
         AUTHENTICATION_ERROR = 1
         COMMUNICATION_ERROR = 2
+        CONNECTION_ERROR = 2
 
         def self.loadJar
             Rjb::load(nil, nil)

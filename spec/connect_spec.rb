@@ -100,7 +100,7 @@ describe Bezebe::CVS::CVSClient do
         end
 
 
-        context "when using wrong hostname" do
+        context "when using wrong (non existing) hostname" do
             before :each do
                 @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, host: "wronghost")
             end
@@ -119,6 +119,45 @@ describe Bezebe::CVS::CVSClient do
             end
         end
 
+
+        context "when using wrong port" do
+            before :each do
+                @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, port: 9999)
+            end
+
+            it "reports not establishing a connection" do
+                @client_connected.should be_false
+            end
+
+            it "reports not being connected" do
+                @client.is_connected?.should be_false 
+            end
+
+            it "reports the error as a connection error" do
+                @client.last_error.should_not be_nil
+                expect(@client.last_error[:type]).to eq(Bezebe::CVS::CONNECTION_ERROR)
+            end
+        end
+
+        context "when using wrong (existing) hostname/port" do
+            before :each do
+                @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, host: "www.google.com", port:80)
+            end
+
+            it "reports not establishing a connection" do
+                @client_connected.should be_false
+            end
+
+            it "reports not being connected" do
+                @client.is_connected?.should be_false 
+            end
+
+            it "reports the error as a communication error" do
+                @client.last_error.should_not be_nil
+                puts @client.last_error.to_yaml
+                expect(@client.last_error[:type]).to eq(Bezebe::CVS::COMMUNICATION_ERROR)
+            end
+        end
     end
 
 end
