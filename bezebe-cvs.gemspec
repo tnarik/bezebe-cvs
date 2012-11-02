@@ -23,11 +23,14 @@ Gem::Specification.new do |gem|
     # runtime dependencies
     gem.add_runtime_dependency "rjb"
 
-    # devevelopment dependencies
+    # development dependencies
     gem.add_development_dependency "thor"
     gem.add_development_dependency "bundler"
 
     # testing
     gem.add_development_dependency 'rspec'
     gem.add_development_dependency 'factory_girl'
+
+    # profiling
+    #gem.add_development_dependency 'rspec-prof'
 end
