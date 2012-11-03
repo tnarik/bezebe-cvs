@@ -12,7 +12,9 @@ module Bezebe
     module CVS
         AUTHENTICATION_ERROR = 1
         COMMUNICATION_ERROR = 2
-        CONNECTION_ERROR = 2
+        CONNECTION_ERROR = 3
+        TIMEOUT_ERROR = 4
+
 
         def self.loadJar
             Rjb::load(nil, nil)

@@ -36,28 +36,39 @@ module CVS
                 @connection.setPort connection_details[4] unless connection_details[4].nil?
             end
                 
-
             begin
-                @connection.open
+                client = get_cvs_client
+                client.ensureConnection
                 return true
-            rescue AuthenticationException => e
-                @last_error = {}
-                @last_error[:message] = e.getMessage
-                @last_error[:localized_message] = e.getLocalizedMessage
-                @last_error[:cause] = e.getCause.nil? ? "" : e.getCause.toString
-                case e.getMessage
-                    when "AuthenticationFailed"
-                        @last_error[:type] = AUTHENTICATION_ERROR
-                    when "IOException"
-                        @last_error[:type] = COMMUNICATION_ERROR
-                    when "ConnectException"
-                        @last_error[:type] = CONNECTION_ERROR
+            rescue => e
+                begin
+                    if e._classname == "org.netbeans.lib.cvsclient.connection.AuthenticationException" then
+                        @last_error = {}
+                        @last_error[:message] = e.getMessage
+                        @last_error[:localized_message] = e.getLocalizedMessage
+                        @last_error[:cause] = e.getCause.nil? ? "" : e.getCause.toString
+                        case e.getMessage
+                            when "AuthenticationFailed"
+                                @last_error[:type] = AUTHENTICATION_ERROR
+                            when "IOException"
+                                @last_error[:type] = COMMUNICATION_ERROR
+                            when "ConnectException"
+                                @last_error[:type] = CONNECTION_ERROR
+                            when "Timeout, no response from server."
+                                @last_error[:type] = TIMEOUT_ERROR
+                        end
+                    end
+                rescue NoMethodError => e
+                    # The error doesn't respond to RJB derived methods
+                    return false
                 end
                 return false
             end
         end
     
         def is_connected?
+            #p @connection
+            #p @connection.isOpen
             return @connection.isOpen
         end
     
