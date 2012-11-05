@@ -12,11 +12,7 @@ module CVS
     class CVSClient
         attr_accessor :connection, :last_error
 
-        def initialize
-            ::Bezebe::CVS.loadJar
-        end
-
-        def connect(*connection_details)
+        def connection=(connection_details)
             @connection = Rjb::import('org.netbeans.lib.cvsclient.connection.PServerConnection').new
             scrambler = Rjb::import('org.netbeans.lib.cvsclient.connection.StandardScrambler').getInstance
 
@@ -35,6 +31,17 @@ module CVS
                 @connection.setRepository connection_details[3] unless connection_details[3].nil?   
                 @connection.setPort connection_details[4] unless connection_details[4].nil?
             end
+            @connection
+        end
+        private :connection=
+
+        def initialize (*connection_details)
+            ::Bezebe::CVS.loadJar
+            self.connection = connection_details unless connection_details.empty?
+        end
+
+        def connect(*connection_details)
+            self.connection = connection_details unless connection_details.empty?
                 
             begin
                 client = get_cvs_client
@@ -56,6 +63,9 @@ module CVS
                                 @last_error[:type] = CONNECTION_ERROR
                             when "Timeout, no response from server."
                                 @last_error[:type] = TIMEOUT_ERROR
+                                # Let's make sure the connection is closed
+                                @connection.close
+
                         end
                     end
                 rescue NoMethodError => e

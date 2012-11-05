@@ -50,7 +50,7 @@ module CVS
             return nil
         end
         def commandTerminated (termination_event)
-            p "terminated"
+            #p "terminated"
         end
         def moduleExpanded (module_expansion_event)
             #p "expanded"
