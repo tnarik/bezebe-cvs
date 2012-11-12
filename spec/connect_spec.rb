@@ -7,7 +7,6 @@ describe Bezebe::CVS::CVSClient do
     end
 
     describe "#connect" do
-
         before :all do
             @client = ::Bezebe::CVS::CVSClient.new
             @connection_details = FactoryGirl.build(:connection_details)
@@ -18,7 +17,6 @@ describe Bezebe::CVS::CVSClient do
             #stub!(:puts)
             #stub!(:p)
         end
-
 
         context "regarding parameters" do
             it "supports a hash" do
@@ -38,20 +36,40 @@ describe Bezebe::CVS::CVSClient do
                     @connection_details.host,
                     @connection_details.repository }.to_not raise_error (ArgumentError)
             end
+            it "supports zero arguments" do
+                expect { @client.connect }.to_not raise_error (ArgumentError)
+            end
         end
 
-
         context "when using correct credentials" do
-            before :each do
-                @client_connected = @client.connect @connection_details_attributes
+            context "as parameters" do
+                before :each do
+                 @client_connected = @client.connect @connection_details_attributes
+                end
+
+                it "reports establishing a connection" do
+                    @connection_details_attributes.should be_true
+                end
+                it "reports being connected" do
+                    @client.is_connected?.should be_true 
+                    p @client
+                end
             end
 
-            it "reports establishing a connection" do
-                @connection_details_attributes.should be_true
-            end
+            context "as initialization" do
 
-            it "reports being connected" do
-                @client.is_connected?.should be_true 
+                before :each do
+                    @client = ::Bezebe::CVS::CVSClient.new @connection_details_attributes
+                    @client_connected = @client.connect @connection_details_attributes
+                end
+
+                it "reports establishing a connection" do
+                    @connection_details_attributes.should be_true
+                end
+                it "reports being connected" do
+                    @client.is_connected?.should be_true
+                    p @client
+                end
             end
 
             context "and when another client connects" do
@@ -79,7 +97,6 @@ describe Bezebe::CVS::CVSClient do
             end
         end
 
-
         context "when using wrong credentials" do
             before :each do
                 @client_connected = @client.connect FactoryGirl.attributes_for(:connection_details, password: "wrongpassword")
@@ -88,17 +105,14 @@ describe Bezebe::CVS::CVSClient do
             it "reports not establishing a connection" do
                 @client_connected.should be_false
             end
-
             it "reports not being connected" do
                 @client.is_connected?.should be_false 
             end
-
             it "reports the error as an authentication error" do
                 @client.last_error.should_not be_nil
                 expect(@client.last_error[:type]).to eq(Bezebe::CVS::AUTHENTICATION_ERROR)
             end
         end
-
 
         context "when using wrong (non existing) hostname" do
             before :each do
@@ -108,17 +122,14 @@ describe Bezebe::CVS::CVSClient do
             it "reports not establishing a connection" do
                 @client_connected.should be_false
             end
-
             it "reports not being connected" do
                 @client.is_connected?.should be_false 
             end
-
             it "reports the error as a communication error" do
                 @client.last_error.should_not be_nil
                 expect(@client.last_error[:type]).to eq(Bezebe::CVS::COMMUNICATION_ERROR)
             end
         end
-
 
         context "when using wrong port" do
             before :each do
@@ -128,17 +139,14 @@ describe Bezebe::CVS::CVSClient do
             it "reports not establishing a connection" do
                 @client_connected.should be_false
             end
-
             it "reports not being connected" do
                 @client.is_connected?.should be_false 
             end
-
             it "reports the error as a connection error" do
                 @client.last_error.should_not be_nil
                 expect(@client.last_error[:type]).to eq(Bezebe::CVS::CONNECTION_ERROR)
             end
         end
-
 
         context "when using wrong (existing) hostname/port that responds" do
             before :each do
@@ -148,17 +156,14 @@ describe Bezebe::CVS::CVSClient do
             it "reports not establishing a connection" do
                 @client_connected.should be_false
             end
-
             it "reports not being connected" do
                 @client.is_connected?.should be_false 
             end
-
             it "reports the error as an authentication error" do
                 @client.last_error.should_not be_nil
                 expect(@client.last_error[:type]).to eq(Bezebe::CVS::AUTHENTICATION_ERROR)
             end
         end
-
 
         context "when using wrong (existing) hostname/port that doesn't respond" do
             before :each do
@@ -168,16 +173,13 @@ describe Bezebe::CVS::CVSClient do
             it "reports not establishing a connection" do
                 @client_connected.should be_false
             end
-
             it "reports not being connected" do
                 @client.is_connected?.should be_false 
             end
-
             it "reports the error as a timeout error" do
                 @client.last_error.should_not be_nil
                 expect(@client.last_error[:type]).to eq(Bezebe::CVS::TIMEOUT_ERROR)
             end
         end
     end
-
 end
