@@ -10,6 +10,9 @@ require "rjb"
 module Bezebe
 module CVS
     class CVSClient
+
+        CVSLISTENER_CLASS = "org.netbeans.lib.cvsclient.event.CVSListener"
+
         attr_accessor :connection, :last_error
         attr_accessor :standardadminhandler_class, :client_class, :checkoutcommand_class, :statuscommand_class, :logcommand_class, :rlogcommand_class, :global_options_class
         attr_accessor :global_options
@@ -39,21 +42,21 @@ module CVS
 
         def initialize (*connection_details)
             ::Bezebe::CVS.loadJar
-            self.connection = connection_details unless connection_details.empty?
+            @connection = connection_details unless connection_details.empty?
 
-            self.standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
-            self.client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
-            self.checkoutcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand')
-            self.statuscommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.status.StatusCommand')
-            self.logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.LogCommand')
-            self.rlogcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
+            @standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
+            @client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
+            @checkoutcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.checkout.CheckoutCommand')
+            @statuscommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.status.StatusCommand')
+            @logcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.LogCommand')
+            @rlogcommand_class = Rjb::import('org.netbeans.lib.cvsclient.command.log.RlogCommand')
             
-            self.global_options_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
-            self.global_options = self.global_options_class.new
+            global_options_class = Rjb::import('org.netbeans.lib.cvsclient.command.GlobalOptions')
+            @global_options = global_options_class.new
         end
 
         def connect(*connection_details)
-            self.connection = connection_details unless connection_details.empty?
+            @connection = connection_details unless connection_details.empty?
                 
             begin
                 client = get_cvs_client
@@ -95,7 +98,7 @@ module CVS
         end
     
         def get_cvs_client
-            client = self.client_class.new(@connection, self.standardadminhandler_class.new)
+            client = @client_class.new(@connection, @standardadminhandler_class.new)
     
             return client
         end
@@ -132,18 +135,18 @@ module CVS
                 client = get_cvs_client
                 client.setLocalPath path
     
-                checkoutcommand = self.checkoutcommand_class.new
+                checkoutcommand = @checkoutcommand_class.new
     
                 checkoutcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
                 filenames.each { |m| checkoutcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
         
                 event_manager = client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
-                cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+                cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 cvslistener.client = client
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(checkoutcommand, self.global_options)
+                client.executeCommand(checkoutcommand, @global_options)
             rescue => e
                 p e
             rescue CommandAbortedException => e
@@ -169,7 +172,7 @@ module CVS
                 client = get_cvs_client
                 client.setLocalPath path
     
-                statuscommand = self.statuscommand_class.new
+                statuscommand = @statuscommand_class.new
         
                 file_class = Rjb::import('java.io.File')
                 files = []
@@ -179,10 +182,10 @@ module CVS
     
                 event_manager = client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
-                cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+                cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(statuscommand, self.global_options)
+                client.executeCommand(statuscommand, @global_options)
                 return cvslistener
             rescue Exception => e
                 p e
@@ -207,7 +210,7 @@ module CVS
                 client = get_cvs_client
                 client.setLocalPath path
     
-                logcommand = self.logcommand_class.new
+                logcommand = @logcommand_class.new
         
                 file_class = Rjb::import('java.io.File')
                 files = []
@@ -217,10 +220,10 @@ module CVS
     
                 event_manager = client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
-                cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+                cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(logcommand, self.global_options)
+                client.executeCommand(logcommand, @global_options)
                 return cvslistener
             rescue Exception => e
                 p e
@@ -244,17 +247,17 @@ module CVS
             begin
                 client = get_cvs_client
     
-                rlogcommand = self.rlogcommand_class.new
+                rlogcommand = @rlogcommand_class.new
     
                 rlogcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
                 filenames.each { |m| rlogcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
     
                 event_manager = client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
-                cvslistener = Rjb::bind(cvslistener, 'org.netbeans.lib.cvsclient.event.CVSListener')
+                cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(rlogcommand, self.global_options)
+                client.executeCommand(rlogcommand, @global_options)
                 return cvslistener
             rescue Exception => e
                 p e

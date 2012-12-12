@@ -2,6 +2,10 @@ module Bezebe
 module CVS
     class CvsListener
 
+        ERRORMESSAGERESPONSE_CLASS = "org.netbeans.lib.cvsclient.response.ErrorMessageResponse"
+        LOGINFORMATION_CLASS = "org.netbeans.lib.cvsclient.command.log.LogInformation"
+        STATUSINFORMATION_CLASS = "org.netbeans.lib.cvsclient.command.status.StatusInformation"
+
         attr_accessor :logInfo, :logInfos, :client
 
         def messageSent (message_event)
@@ -11,7 +15,7 @@ module CVS
             #p message_event.isTagged
             #p message_event.toString
             #p message_event.getSource._classname
-            if message_event.getSource._classname == "org.netbeans.lib.cvsclient.response.ErrorMessageResponse" then
+            if message_event.getSource._classname == ERRORMESSAGERESPONSE_CLASS then
                 if message_event.getSource.getMessage =~ /\[server\ aborted\]/ then
                     client.abort
                 end
@@ -31,12 +35,12 @@ module CVS
         end
         def fileInfoGenerated (file_info_event)
             #p "info"
-            if file_info_event.getInfoContainer._classname == "org.netbeans.lib.cvsclient.command.log.LogInformation" then
+            if file_info_event.getInfoContainer._classname == LOGINFORMATION_CLASS then
                 @logInfo = ::Bezebe::CVS::LogInfo.new file_info_event.getInfoContainer
                 @logInfos = [] if @logInfos.nil?;
                 @logInfos << @logInfo
             end
-            if file_info_event.getInfoContainer._classname == "org.netbeans.lib.cvsclient.command.status.StatusInformation" then
+            if file_info_event.getInfoContainer._classname == STATUSINFORMATION_CLASS then
                 p "some status information to be processed"
                 p file_info_event.getInfoContainer.getRepositoryRevision
                 p file_info_event.getInfoContainer.getWorkingRevision
