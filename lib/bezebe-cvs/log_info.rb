@@ -20,22 +20,22 @@ module CVS
                         @locks = logInformation.getLocks
     
                         # list of revisions
-                        @revisions = {}
+                        self.revisions = {}
                         unless logInformation.getRevisionList.nil? then
                             revisions = logInformation.getRevisionList.toArray 
                             revisions.each do |revision|
                                 new_revision = ::Bezebe::CVS::Revision.new revision
-                                @revisions[new_revision.number] = new_revision
+                                self.revisions[new_revision.number] = new_revision
                             end
                         end
     
                         # list of symbolic names
-                        @symbolicNames = {}
+                        self.symbolicNames = {}
                         unless logInformation.getAllSymbolicNames.nil? then
                             symbolicNames = logInformation.getAllSymbolicNames.toArray 
                             symbolicNames.each do |symbolicName|
                                 new_symbolicName = ::Bezebe::CVS::SymName.new symbolicName
-                                @symbolicNames[new_symbolicName.name] = new_symbolicName
+                                self.symbolicNames[new_symbolicName.name] = new_symbolicName
                             end
                         end
                     end
@@ -47,7 +47,7 @@ module CVS
 
         def symName_for_revision (revision)
             list = []
-            @symbolicNames.each do |k, symbolicName|
+            self.symbolicNames.each do |k, symbolicName|
                 list << symbolicName if k == revision
             end
             return list;

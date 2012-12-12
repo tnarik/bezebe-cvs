@@ -14,7 +14,7 @@ module CVS
         CVSLISTENER_CLASS = "org.netbeans.lib.cvsclient.event.CVSListener"
 
         attr_accessor :connection, :last_error
-        attr_accessor :standardadminhandler_class, :client_class, :checkoutcommand_class, :statuscommand_class, :logcommand_class, :rlogcommand_class, :global_options_class
+        #attr_accessor :standardadminhandler_class, :client_class, :checkoutcommand_class, :statuscommand_class, :logcommand_class, :rlogcommand_class, :global_options_class
         attr_accessor :global_options
 
         def connection=(connection_details)
@@ -36,13 +36,13 @@ module CVS
                 @connection.setRepository connection_details[3] unless connection_details[3].nil?   
                 @connection.setPort connection_details[4] unless connection_details[4].nil?
             end
-            @connection
+            connection
         end
         private :connection=
 
         def initialize (*connection_details)
             ::Bezebe::CVS.loadJar
-            @connection = connection_details unless connection_details.empty?
+            self.connection = connection_details unless connection_details.empty?
 
             @standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
             @client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
@@ -56,7 +56,7 @@ module CVS
         end
 
         def connect(*connection_details)
-            @connection = connection_details unless connection_details.empty?
+            self.connection = connection_details unless connection_details.empty?
                 
             begin
                 client = get_cvs_client
@@ -79,7 +79,7 @@ module CVS
                             when "Timeout, no response from server."
                                 @last_error[:type] = TIMEOUT_ERROR
                                 # Let's make sure the connection is closed
-                                @connection.close
+                                self.connection.close
 
                         end
                     end
@@ -92,19 +92,19 @@ module CVS
         end
     
         def is_connected?
-            #p @connection
-            #p @connection.isOpen
-            return @connection.isOpen
+            #p self.connection
+            #p self.connection.isOpen
+            return self.connection.isOpen
         end
     
         def get_cvs_client
-            client = @client_class.new(@connection, @standardadminhandler_class.new)
+            client = @client_class.new(self.connection, @standardadminhandler_class.new)
     
             return client
         end
     
         def update
-            if @connection.nil?
+            if self.connection.nil?
                 puts "a connection is needed first"
                 return false
             end
@@ -126,7 +126,7 @@ module CVS
         end
     
         def checkout (path, filenames = nil)
-            if @connection.nil?
+            if self.connection.nil?
                 puts "a connection is needed first"
                 return false
             end
@@ -163,7 +163,7 @@ module CVS
         end
     
         def status (path, filenames = nil)
-            if @connection.nil?
+            if self.connection.nil?
                 puts "a connection is needed first"
                 return false
             end
@@ -201,7 +201,7 @@ module CVS
         end
     
         def log (path, filenames = nil)
-            if @connection.nil?
+            if self.connection.nil?
                 puts "a connection is needed first"
                 return false
             end
@@ -239,7 +239,7 @@ module CVS
         end
     
         def rlog (filenames = nil)
-            if @connection.nil?
+            if self.connection.nil?
                 puts "a connection is needed first"
                 return false
             end
