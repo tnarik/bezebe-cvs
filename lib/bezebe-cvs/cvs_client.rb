@@ -12,13 +12,13 @@ module CVS
     class CVSClient
 
         CVSLISTENER_CLASS = "org.netbeans.lib.cvsclient.event.CVSListener"
+        PSERVERCONNECTION_CLASS = "org.netbeans.lib.cvsclient.connection.PServerConnection"
 
-        attr_accessor :connection, :last_error
-        #attr_accessor :standardadminhandler_class, :client_class, :checkoutcommand_class, :statuscommand_class, :logcommand_class, :rlogcommand_class, :global_options_class
+        attr_accessor :connection_details, :connection, :last_error
         attr_accessor :global_options
 
         def connection=(connection_details)
-            @connection = Rjb::import('org.netbeans.lib.cvsclient.connection.PServerConnection').new
+            @connection = Rjb::import(PSERVERCONNECTION_CLASS).new
             scrambler = Rjb::import('org.netbeans.lib.cvsclient.connection.StandardScrambler').getInstance
 
             if connection_details.size == 1 then
@@ -36,13 +36,14 @@ module CVS
                 @connection.setRepository connection_details[3] unless connection_details[3].nil?   
                 @connection.setPort connection_details[4] unless connection_details[4].nil?
             end
-            connection
+            @connection
         end
         private :connection=
 
         def initialize (*connection_details)
             ::Bezebe::CVS.loadJar
-            self.connection = connection_details unless connection_details.empty?
+            self.connection_details = connection_details unless connection_details.empty?
+            #self.connection = connection_details unless connection_details.empty?
 
             @standardadminhandler_class = Rjb::import('org.netbeans.lib.cvsclient.admin.StandardAdminHandler')
             @client_class = Rjb::import('org.netbeans.lib.cvsclient.Client')
@@ -55,12 +56,17 @@ module CVS
             @global_options = global_options_class.new
         end
 
+        def disconnect
+            self.connection.close
+        end
+
         def connect(*connection_details)
             self.connection = connection_details unless connection_details.empty?
+            self.connection = self.connection_details if connection_details.empty?
                 
             begin
-                client = get_cvs_client
-                client.ensureConnection
+                @client = get_cvs_client
+                @client.ensureConnection
                 return true
             rescue => e
                 begin
@@ -92,15 +98,14 @@ module CVS
         end
     
         def is_connected?
-            #p self.connection
+            return false if @client.nil?
+            return false if self.connection.nil?
             #p self.connection.isOpen
             return self.connection.isOpen
         end
     
         def get_cvs_client
-            client = @client_class.new(self.connection, @standardadminhandler_class.new)
-    
-            return client
+            @client_class.new(self.connection, @standardadminhandler_class.new)
         end
     
         def update
@@ -110,8 +115,8 @@ module CVS
             end
     
             begin
-                client = get_cvs_client
-                client.setLocalPath "/tmp/w3c/test/"
+                get_cvs_client
+                @client.setLocalPath "/tmp/w3c/test/"
             rescue Exception => e
                 p e
             rescue CommandException => e
@@ -132,21 +137,21 @@ module CVS
             end
     
             begin
-                client = get_cvs_client
-                client.setLocalPath path
+                get_cvs_client
+                @client.setLocalPath path
     
                 checkoutcommand = @checkoutcommand_class.new
     
                 checkoutcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
                 filenames.each { |m| checkoutcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
         
-                event_manager = client.getEventManager
+                event_manager = @client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
                 cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
-                cvslistener.client = client
+                cvslistener.client = @client
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(checkoutcommand, @global_options)
+                @client.executeCommand(checkoutcommand, @global_options)
             rescue => e
                 p e
             rescue CommandAbortedException => e
@@ -169,8 +174,8 @@ module CVS
             end
     
             begin
-                client = get_cvs_client
-                client.setLocalPath path
+                get_cvs_client
+                @client.setLocalPath path
     
                 statuscommand = @statuscommand_class.new
         
@@ -180,12 +185,12 @@ module CVS
                 filenames.each { |m| files << ( file_class.new m) } unless filenames.nil? or !filenames.is_a? Array
                 statuscommand.setFiles files
     
-                event_manager = client.getEventManager
+                event_manager = @client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
                 cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(statuscommand, @global_options)
+                @client.executeCommand(statuscommand, @global_options)
                 return cvslistener
             rescue Exception => e
                 p e
@@ -207,8 +212,8 @@ module CVS
             end
     
             begin
-                client = get_cvs_client
-                client.setLocalPath path
+                get_cvs_client
+                @client.setLocalPath path
     
                 logcommand = @logcommand_class.new
         
@@ -218,12 +223,12 @@ module CVS
                 filenames.each { |m| files << ( file_class.new m) } unless filenames.nil? or !filenames.is_a? Array
                 logcommand.setFiles files
     
-                event_manager = client.getEventManager
+                event_manager = @client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
                 cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
                 event_manager.addCVSListener cvslistener
     
-                client.executeCommand(logcommand, @global_options)
+                @client.executeCommand(logcommand, @global_options)
                 return cvslistener
             rescue Exception => e
                 p e
@@ -239,35 +244,41 @@ module CVS
         end
     
         def rlog (filenames = nil)
-            if self.connection.nil?
-                puts "a connection is needed first"
-                return false
+            unless self.is_connected?
+                self.connect
+                if self.connection.nil?
+                    puts "a connection is needed first"
+                    return false
+                end
             end
     
             begin
-                client = get_cvs_client
-    
                 rlogcommand = @rlogcommand_class.new
     
                 rlogcommand.setModule "#{filenames}" unless filenames.nil? or filenames.is_a? Array
                 filenames.each { |m| rlogcommand.setModule "#{m}" } unless filenames.nil? or !filenames.is_a? Array
     
-                event_manager = client.getEventManager
+                event_manager = @client.getEventManager
                 cvslistener = ::Bezebe::CVS::CvsListener.new
                 cvslistener = Rjb::bind(cvslistener, CVSLISTENER_CLASS)
-                event_manager.addCVSListener cvslistener
+                cvslistener.client = @client
+                #event_manager.addCVSListener cvslistener
     
-                client.executeCommand(rlogcommand, @global_options)
-                return cvslistener
+                @client.executeCommand(rlogcommand, @global_options)
+                rlogcommand.clearModules
             rescue Exception => e
                 p e
+                cvslistener = nil
             rescue AuthenticationException => e
                 p e.getMessage
                 p e.printStackTrace
+                cvslistener = nil
             ensure
-                event_manager.removeCVSListener cvslistener
+                #event_manager.removeCVSListener cvslistener
                 Rjb::unbind(cvslistener)
+                self.disconnect
             end
+            cvslistener
         end
     end
 end

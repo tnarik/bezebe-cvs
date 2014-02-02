@@ -35,23 +35,22 @@ module CVS
         end
         def fileInfoGenerated (file_info_event)
             #p "info"
-            if file_info_event.getInfoContainer._classname == LOGINFORMATION_CLASS then
-                @logInfo = ::Bezebe::CVS::LogInfo.new file_info_event.getInfoContainer
-                @logInfos = [] if @logInfos.nil?;
-                @logInfos << @logInfo
-            end
-            if file_info_event.getInfoContainer._classname == STATUSINFORMATION_CLASS then
-                p "some status information to be processed"
-                p file_info_event.getInfoContainer.getRepositoryRevision
-                p file_info_event.getInfoContainer.getWorkingRevision
-                p file_info_event.getInfoContainer.getStatusString
-                p file_info_event.getInfoContainer.getStickyDate
-                p file_info_event.getInfoContainer.getStickyOptions
-                p file_info_event.getInfoContainer.getStickyTag
-
-                p file_info_event.getInfoContainer.getRepositoryFileName
-            end
-            return nil
+            #if file_info_event.getInfoContainer._classname == LOGINFORMATION_CLASS then
+            #    #@logInfo = ::Bezebe::CVS::LogInfo.new file_info_event.getInfoContainer
+            #    #@logInfos = [] if @logInfos.nil?;
+            #    #@logInfos << @logInfo
+            #end
+            #if file_info_event.getInfoContainer._classname == STATUSINFORMATION_CLASS then
+            #    p "some status information to be processed"
+            #    p file_info_event.getInfoContainer.getRepositoryRevision
+            #    p file_info_event.getInfoContainer.getWorkingRevision
+            #    p file_info_event.getInfoContainer.getStatusString
+            #    p file_info_event.getInfoContainer.getStickyDate
+            #    p file_info_event.getInfoContainer.getStickyOptions
+            #    p file_info_event.getInfoContainer.getStickyTag
+#
+            #    p file_info_event.getInfoContainer.getRepositoryFileName
+            #end
         end
         def commandTerminated (termination_event)
             #p "terminated"
